@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using UnityEngine;
+using System.Diagnostics;
 
 public class SocketReceiver : MonoBehaviour
 {
@@ -23,7 +24,7 @@ void Start()
     if (visualizer == null)
     {
         visualizer = FindObjectOfType<BulletPathVisualizer>();
-        Debug.Log("Visualizer automatisch gevonden: " + visualizer);
+        UnityEngine.Debug.Log("Visualizer automatisch gevonden: " + visualizer);
     }
 
     StartServer();
@@ -32,7 +33,7 @@ public void StartServer()
 {
     if (serverRunning)
     {
-        Debug.Log("Server draait al!");
+        UnityEngine.Debug.Log("Server draait al!");
         return;
     }
 
@@ -40,7 +41,7 @@ public void StartServer()
     server.Start();
     serverRunning = true;
 
-    Debug.Log("Wachten op verbinding...");
+    UnityEngine.Debug.Log("Wachten op verbinding...");
 
     server.BeginAcceptTcpClient(OnClientConnected, null);
 }
@@ -55,10 +56,10 @@ void Update()
         BulletData.direction = pendingDirection;
         BulletData.hasData = true;
 
-        Debug.Log("DATA RECEIVED");
+        UnityEngine.Debug.Log("DATA RECEIVED");
 
-        Debug.Log("ENTRY: " + pendingEntry);
-        Debug.Log("DIR: " + pendingDirection);
+        UnityEngine.Debug.Log("ENTRY: " + pendingEntry);
+        UnityEngine.Debug.Log("DIR: " + pendingDirection);
 
         if (visualizer != null)
         {
@@ -66,7 +67,7 @@ void Update()
         }
         else
         {
-            Debug.LogError("Visualizer is NULL");
+            UnityEngine.Debug.LogError("Visualizer is NULL");
         }
     }
 }
@@ -76,23 +77,35 @@ void Update()
     client = server.EndAcceptTcpClient(result);
     stream = client.GetStream();
 
-    Debug.Log("Verbonden met Slicer!");
+    UnityEngine.Debug.Log("Verbonden met Slicer!");
 
     // 🔥 BELANGRIJK: blijf luisteren
     byte[] buffer = new byte[1024];
 
     while (true)
-    {
-        int bytesRead = stream.Read(buffer, 0, buffer.Length);
+{
+    Stopwatch stopwatch = new Stopwatch();
 
-        if (bytesRead == 0)
-            break;
+    stopwatch.Start();
 
-        string data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-        Debug.Log("Ontvangen: " + data);
+    int bytesRead = stream.Read(buffer, 0, buffer.Length);
 
-        ProcessData(data);
-    }
+    stopwatch.Stop();
+
+    UnityEngine.Debug.Log(
+    "TCP latency: "
+    + stopwatch.Elapsed.TotalMilliseconds
+    + " ms");
+
+    if (bytesRead == 0)
+        break;
+
+    string data = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+
+    UnityEngine.Debug.Log("Ontvangen: " + data);
+
+    ProcessData(data);
+}
 }
 
 void ProcessData(string data)
@@ -151,7 +164,7 @@ float SafeParse(string s)
         return value;
     }
 
-    Debug.LogError("PARSE FOUT: [" + s + "]");
+    UnityEngine.Debug.LogError("PARSE FOUT: [" + s + "]");
     return 0f;
 }
 
@@ -182,6 +195,6 @@ float SafeParse(string s)
 
     serverRunning = false;
 
-    Debug.Log("Server gestopt");
+    UnityEngine.Debug.Log("Server gestopt");
 }
 }

@@ -14,7 +14,7 @@ public class SimpleBulletLine : MonoBehaviour
 
     [Header("Line Settings")]
     public float lineLength = 1.5f;
-    public float lineWidth = 0.01f;
+    public float lineWidth = 0.05f;
     public Color lineColor = Color.red;
 
     [Header("Direction Offset")]
@@ -36,6 +36,9 @@ public class SimpleBulletLine : MonoBehaviour
             new Material(Shader.Find("Unlit/Color"));
 
         lineRenderer.material.color = lineColor;
+        lineRenderer.material.renderQueue = 5000;
+        lineRenderer.material.SetInt("_ZWrite", 0);
+        lineRenderer.material.SetInt("_ZTest", (int)UnityEngine.Rendering.CompareFunction.Always);
 
         if (gunPrefab != null)
         {
@@ -48,14 +51,17 @@ public class SimpleBulletLine : MonoBehaviour
         if (gunInstance == null || startAnchor == null)
             return;
 
-        Vector3 startPoint = startAnchor.position;
-
         Vector3 baseDirection =
-            -gunInstance.transform.forward;
+    -gunInstance.transform.forward;
 
-        Vector3 direction =
-            (baseDirection + directionOffset).normalized;
+Vector3 direction =
+    (baseDirection + directionOffset).normalized;
 
+// kleine offset om z-fighting te vermijden
+Vector3 startPoint =
+    startAnchor.position +
+    direction * 0.01f;
+    
         Vector3 endPoint =
             startPoint + direction * lineLength;
 

@@ -66,42 +66,100 @@ public class BulletPathVisualizer : MonoBehaviour
 
     void CalculateAlignment()
 {
-    // ---- SLICER PUNTEN ----
+    // ===== SLICER =====
 
     Vector3 s_sternum = ApplyRasToUnity(sternumSlicerMm);
     Vector3 s_left = ApplyRasToUnity(clavicleLSlicerMm);
     Vector3 s_right = ApplyRasToUnity(clavicleRSlicerMm);
 
-    // ---- UNITY PUNTEN ----
+    // ===== UNITY =====
 
     Vector3 u_sternum = sternumUnity.position;
     Vector3 u_left = clavicleUnityL.position;
     Vector3 u_right = clavicleUnityR.position;
 
-    // ---- SCHAAL ----
+    // =====================================================
+    // SCALE
+    // =====================================================
 
     float slicerWidth = Vector3.Distance(s_left, s_right);
     float unityWidth = Vector3.Distance(u_left, u_right);
 
     scaleFactor = unityWidth / slicerWidth;
 
-    Debug.Log("Scale factor: " + scaleFactor);
+    // SCALE toepassen op slicerpunten
 
-    // ---- ROTATIE ----
+    s_sternum *= scaleFactor;
+    s_left *= scaleFactor;
+    s_right *= scaleFactor;
 
-    Vector3 slicerDir = (s_right - s_left).normalized;
-    Vector3 unityDir = (u_right - u_left).normalized;
+    // =====================================================
+    // SLICER BASIS
+    // =====================================================
+
+    Vector3 s_x = (s_right - s_left).normalized;
+
+    Vector3 s_mid = (s_left + s_right) * 0.5f;
+
+    Vector3 s_y = (s_sternum - s_mid).normalized;
+
+    Vector3 s_z = Vector3.Cross(s_x, s_y).normalized;
+
+    // orthogonaal maken
+
+    s_y = Vector3.Cross(s_z, s_x).normalized;
+
+    // =====================================================
+    // UNITY BASIS
+    // =====================================================
+
+    Vector3 u_x = (u_right - u_left).normalized;
+
+    Vector3 u_mid = (u_left + u_right) * 0.5f;
+
+    Vector3 u_y = (u_sternum - u_mid).normalized;
+
+    Vector3 u_z = Vector3.Cross(u_x, u_y).normalized;
+
+    u_y = Vector3.Cross(u_z, u_x).normalized;
+
+    // =====================================================
+    // ROTATIEMATRICES
+    // =====================================================
+
+    Matrix4x4 slicerBasis = Matrix4x4.identity;
+
+    slicerBasis.SetColumn(0, new Vector4(s_x.x, s_x.y, s_x.z, 0));
+    slicerBasis.SetColumn(1, new Vector4(s_y.x, s_y.y, s_y.z, 0));
+    slicerBasis.SetColumn(2, new Vector4(s_z.x, s_z.y, s_z.z, 0));
+
+    Matrix4x4 unityBasis = Matrix4x4.identity;
+
+    unityBasis.SetColumn(0, new Vector4(u_x.x, u_x.y, u_x.z, 0));
+    unityBasis.SetColumn(1, new Vector4(u_y.x, u_y.y, u_y.z, 0));
+    unityBasis.SetColumn(2, new Vector4(u_z.x, u_z.y, u_z.z, 0));
+
+    // =====================================================
+    // VOLLEDIGE ROTATIE
+    // =====================================================
+
+    Matrix4x4 rotationMatrix =
+        unityBasis * slicerBasis.inverse;
 
     alignmentRotation =
-        Quaternion.FromToRotation(slicerDir, unityDir);
+        rotationMatrix.rotation;
 
-    // ---- OFFSET ----
+    // =====================================================
+    // OFFSET
+    // =====================================================
 
     Vector3 transformedSternum =
-        alignmentRotation * (s_sternum * scaleFactor);
+        alignmentRotation * s_sternum;
 
     alignmentOffset =
         u_sternum - transformedSternum;
+
+    Debug.Log("Alignment calculated");
 }
 
     void Start()
@@ -197,7 +255,8 @@ public void OnLiveDataButtonClicked()
 
 
         Vector3 entryPos = ToWorld(entryMm);
-        Vector3 direction = ApplyRasToUnity(dirRAS).normalized;
+        Vector3 direction =
+    (alignmentRotation * ApplyRasToUnity(dirRAS)).normalized;
 
         float currentLength = lineLengthSlider != null ? lineLengthSlider.value : lineLength;
 

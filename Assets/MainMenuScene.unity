@@ -4141,9 +4141,9 @@ MonoBehaviour:
   sternumUnity: {fileID: 2099906344}
   clavicleUnityL: {fileID: 1807721849}
   clavicleUnityR: {fileID: 1763942539}
-  sternumSlicerMm: {x: 2.707, y: 83.744, z: -82.23}
-  clavicleLSlicerMm: {x: 95.89, y: 64.6, z: -38.34}
-  clavicleRSlicerMm: {x: -92.97, y: 58.13, z: -33.828}
+  sternumSlicerMm: {x: -6.575, y: 93.959, z: -128.31}
+  clavicleLSlicerMm: {x: -101.777, y: 70.329, z: -66.016}
+  clavicleRSlicerMm: {x: 83.216, y: 76.392, z: -69.379}
   errorText: {fileID: 1510277774}
   entryX: {fileID: 1119885587}
   entryY: {fileID: 1445683144}
@@ -5795,7 +5795,7 @@ Transform:
   m_GameObject: {fileID: 1763942538}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.1, y: 1.53, z: -0.17}
+  m_LocalPosition: {x: -0.11, y: 1.53, z: -0.17}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6099,7 +6099,7 @@ Transform:
   m_GameObject: {fileID: 1807721848}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.1, y: 1.52, z: -0.16}
+  m_LocalPosition: {x: 0.08, y: 1.52, z: -0.16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
